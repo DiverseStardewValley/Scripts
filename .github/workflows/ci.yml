@@ -1,0 +1,12 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    uses: DiverseStardewValley/.github/.github/workflows/lint.yml@main
+    permissions:
+      contents: write

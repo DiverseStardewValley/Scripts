@@ -1,0 +1,12 @@
+name: CodeQL
+
+on:
+  push:
+    paths:
+      - "**.py"
+
+jobs:
+  analyze:
+    uses: DiverseStardewValley/.github/.github/workflows/codeql-python.yml@main
+    permissions:
+      security-events: write
