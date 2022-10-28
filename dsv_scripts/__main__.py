@@ -4,29 +4,30 @@ from __future__ import annotations
 from importlib.metadata import metadata
 from typing import Final
 
-from rich import print
-from rich.text import Text
+from dsv_scripts import commands
 
-HEADER: Final[tuple[Text, ...]] = (
-    Text(r"      _                            _       _        ", "bright_red"),
-    Text(r"   __| |_____   __   ___  ___ _ __(_)_ __ | |_ ___  ", "bright_red"),
-    Text(r"  / _` / __\ \ / /__/ __|/ __| '__| | '_ \| __/ __| ", "bright_yellow"),
-    Text(r" | (_| \__ \\ V /___\__ \ (__| |  | | |_) | |_\__ \ ", "bright_green"),
-    Text(r"  \__,_|___/ \_/    |___/\___|_|  |_| .__/ \__|___/ ", "bright_cyan"),
-    Text(r"                                    |_| ", "bright_cyan"),
+_HEADER_LINES: Final[tuple[tuple[str, str], ...]] = (
+    (r"      _                            _       _        ", "bright_red"),
+    (r"   __| |_____   __   ___  ___ _ __(_)_ __ | |_ ___  ", "bright_red"),
+    (r"  / _` / __\ \ / /__/ __|/ __| '__| | '_ \| __/ __| ", "bright_yellow"),
+    (r" | (_| \__ \\ V /___\__ \ (__| |  | | |_) | |_\__ \ ", "bright_green"),
+    (r"  \__,_|___/ \_/    |___/\___|_|  |_| .__/ \__|___/ ", "bright_cyan"),
+    (r"                                    |_| ", "bright_cyan"),
 )
 
 
 def main() -> int:
-    """Prints the package name & version. Will probably add more functionality later."""
-    version_text = f"v{metadata('dsv-scripts').json.get('version')}"
-    HEADER[-1].append(f"{version_text.ljust(7).center(12)}\n", "bright_black")
+    """Primary entry function. Parses args and calls the appropriate script/callback."""
+    get_metadata = metadata("dsv-scripts").json.get
+    parser = commands.CommandParser(
+        *_HEADER_LINES,
+        version=get_metadata("version"),
+        description=get_metadata("summary"),
+    )
+    parser.set_defaults(callback=parser.print_help)
 
-    for line in HEADER:
-        line.align("center", 60)
-        print(line)
-
-    return 0
+    expected_args, extra_args = parser.parse_known_args()
+    return expected_args.callback(extra_args) or 0
 
 
 if __name__ == "__main__":
