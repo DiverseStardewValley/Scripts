@@ -22,10 +22,11 @@ target-version = ["py310"]
 
 [tool.isort]
 profile = "black"
+classes = ["IO"]
 
 [tool.pydocstyle]
 convention = "google"
-add-ignore = ["D104", "D417"]
+add-ignore = ["D417"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"

@@ -4,7 +4,7 @@ from __future__ import annotations
 from importlib.metadata import metadata
 from typing import Final
 
-from dsv_scripts import commands
+from dsv_scripts import CommandParser, get_all_commands
 
 _HEADER_LINES: Final[tuple[tuple[str, str], ...]] = (
     (r"      _                            _       _        ", "bright_red"),
@@ -19,12 +19,15 @@ _HEADER_LINES: Final[tuple[tuple[str, str], ...]] = (
 def main() -> int:
     """Primary entry function. Parses args and calls the appropriate script/callback."""
     get_metadata = metadata("dsv-scripts").json.get
-    parser = commands.CommandParser(
+    parser = CommandParser(
         *_HEADER_LINES,
         version=get_metadata("version"),
         description=get_metadata("summary"),
     )
     parser.set_defaults(callback=parser.print_help)
+
+    for command_info in get_all_commands():
+        parser.add_command(command_info)
 
     expected_args, extra_args = parser.parse_known_args()
     return expected_args.callback(extra_args) or 0
