@@ -14,9 +14,6 @@ def get_arg_parser(description: str = "") -> ArgumentParser:
         description:
             A string containing a short, human-readable summary of what the script does.
             Will be displayed when `--help` or `-h` is specified on the command line.
-
-    Raises:
-        N/A
     """
     parser = ArgumentParser(description=description or None, add_help=False)
 
