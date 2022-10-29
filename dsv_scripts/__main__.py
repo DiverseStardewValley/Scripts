@@ -4,7 +4,7 @@ from __future__ import annotations
 from importlib.metadata import metadata
 from typing import Final
 
-from dsv_scripts import CommandParser, get_all_commands
+from dsv_scripts import CommandParser, get_script_modules
 
 _HEADER_LINES: Final[tuple[tuple[str, str], ...]] = (
     (r"      _                            _       _        ", "bright_red"),
@@ -26,8 +26,8 @@ def main() -> int:
     )
     parser.set_defaults(callback=parser.print_help)
 
-    for command_info in get_all_commands():
-        parser.add_command(command_info)
+    for module in get_script_modules():
+        parser.add_command(module)
 
     expected_args, extra_args = parser.parse_known_args()
     return expected_args.callback(extra_args) or 0
