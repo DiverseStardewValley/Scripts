@@ -11,6 +11,8 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from dsv_scripts import get_script_name
+
 
 class CommandParser(ArgumentParser):
     """An `ArgumentParser` for organizing and pretty-printing the available commands."""
@@ -46,9 +48,9 @@ class CommandParser(ArgumentParser):
                 remaining command-line arguments) and returns an integer representing an
                 exit code (i.e. 0 to indicate success, or 1 otherwise).
         """
-        name = getattr(module, "NAME", module.__name__.replace("_", "-"))
+        name = get_script_name(module)
         description = getattr(module, "DESCRIPTION", "")
-        subparser = self.subparsers.add_parser(name, description, add_help=False)
+        subparser = self.subparsers.add_parser(name, help=description, add_help=False)
 
         subparser.set_defaults(callback=getattr(module, "main"))
         self.command_info.append((name, description))

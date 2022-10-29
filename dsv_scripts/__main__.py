@@ -4,7 +4,8 @@ from __future__ import annotations
 from importlib.metadata import metadata
 from typing import Final
 
-from dsv_scripts import CommandParser, get_script_modules
+from dsv_scripts import get_script_modules
+from dsv_scripts.commands import CommandParser
 
 _HEADER_LINES: Final[tuple[tuple[str, str], ...]] = (
     (r"      _                            _       _        ", "bright_red"),
