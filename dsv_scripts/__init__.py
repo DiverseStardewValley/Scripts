@@ -8,7 +8,7 @@ from types import ModuleType
 def get_script_modules() -> list[ModuleType]:
     """Returns a list containing the modules that implement `dsv-scripts` commands."""
     package_dir = Path(__file__).parent
-    skip_modules = ("commands", "utils")
+    skip_modules = ("commands", "fileio", "utils")
     return [
         import_module(f"{package_dir.name}.{path.stem}")
         for path in package_dir.glob("*.py")

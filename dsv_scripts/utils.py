@@ -1,37 +1,9 @@
-from argparse import ArgumentParser
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
 
-from dsv_scripts import get_script_name
-
-
-def get_arg_parser(module_file: str, description: str) -> ArgumentParser:
-    """Creates and returns an `ArgumentParser` for a typical DSV input/output script.
-
-    Args:
-        module_file:
-            A string containing the file path for the script module.
-            Will be parsed to determine the program name to display for the script.
-        description:
-            A string containing a short, human-readable summary of what the script does.
-            Will be displayed when `--help` or `-h` is specified on the command line.
-    """
-    parser = ArgumentParser(
-        prog=get_script_name(module_file), description=description, add_help=False
-    )
-
-    def add_option(option_name: str, **kwargs: Any) -> None:
-        parser.add_argument(f"-{option_name[0]}", f"--{option_name}", **kwargs)
-
-    for name, var in [("input", "X"), ("output", "Y")]:
-        add_option(name, default=".", help=f"name of the {name} directory", metavar=var)
-
-    add_option("force", action="store_true", help="force execute (may overwrite files)")
-    add_option("verbose", action="store_true", help="enable verbose console output")
-    add_option("help", action="help", help="show this help message")
-
-    return parser
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
 
 
 def get_dir_path(raw_path: str, *, create_if_missing: bool = False) -> Path:
@@ -92,10 +64,23 @@ def get_input_and_output_dir_paths(
     output_dir_path = get_dir_path(output_path, create_if_missing=force)
 
     if (input_dir_path == output_dir_path) and (not force):
-        print(
-            f"Input and output directories are the same: {input_dir_path}\n"
-            "Exiting to avoid overwriting files (use '-f' to bypass this check)."
+        hint_text = Text(
+            "(Use -i and -o to set the folders, or -f to bypass this check.)",
+            "bright_black",
         )
+        hint_text.highlight_regex(r" -[iof] ", "bright_cyan")
+
+        error_text = Text.assemble(
+            ("Input and output folders are the same:\n", "bright_red"),
+            str(input_dir_path),
+            ("\n\nExiting to avoid overwriting any files.\n", "bright_yellow"),
+            hint_text,
+            justify="center",
+        )
+        title_text = Text("ERROR", "bright_red")
+
+        panel = Panel(error_text, title=title_text, expand=False, padding=(1, 2))
+        Console().print(panel)
         raise SystemExit(1)
 
     return input_dir_path, output_dir_path
@@ -121,6 +106,7 @@ def get_relevant_file_paths(
             Strings representing file and/or directory paths that may be included
             in the resulting list, if they're deemed relevant.
             Directory paths will be recursively searched for relevant files to include.
+            If omitted, the current working directory will be searched.
         *allowed_exts:
             Strings representing the file extensions to match (case-insensitive).
             If omitted, **all** file extensions will be considered relevant.
@@ -128,7 +114,7 @@ def get_relevant_file_paths(
             The path to the directory that acts as a scope to determine which files are
             relevant. If omitted, the current working directory will serve as the scope.
         verbose:
-            If set to `True`, will print information about excluded files/directories.
+            If set to `True`, will print information about examined files/directories.
 
     Raises:
         FileNotFoundError: If `parent_dir` or any of the `raw_paths` does not
@@ -139,20 +125,20 @@ def get_relevant_file_paths(
     parent_dir = (parent_dir or Path.cwd()).resolve(strict=True)
     file_paths: set[Path] = set()
 
-    def populate_file_paths(source_path: Path) -> None:
-        if source_path.is_dir():
-            for ext in allowed_exts:
-                file_paths.update(source_path.rglob(f"*.{ext}"))
-        elif (allowed_exts == all_exts) or (source_path.suffix.lower() in allowed_exts):
-            file_paths.add(source_path)
-        elif verbose:
-            print(f"Path '{source_path}' has an irrelevant file extension. Ignoring.")
-
-    for raw_path in raw_paths:
+    for raw_path in raw_paths or ["."]:
         path = Path(raw_path).resolve(strict=True)
-        if path.is_relative_to(parent_dir):
-            populate_file_paths(path)
+        if path.is_dir():
+            if verbose:
+                print(f"Searching for relevant files inside directory '{path}'.")
+            for ext in allowed_exts:
+                file_paths.update(path.rglob(f"*.{ext}"))
+        elif (allowed_exts == all_exts) or (path.suffix.lower() in allowed_exts):
+            file_paths.add(path)
         elif verbose:
-            print(f"Path '{path}' is not in the relevant directory. Ignoring.")
+            print(f"File '{path}' does not have a relevant extension. Ignoring.")
 
-    return [file_path.relative_to(parent_dir) for file_path in sorted(file_paths)]
+    return [
+        file_path.relative_to(parent_dir)
+        for file_path in sorted(file_paths)
+        if file_path.is_relative_to(parent_dir)
+    ]
