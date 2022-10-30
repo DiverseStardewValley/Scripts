@@ -1,21 +1,25 @@
-"""This module contains general utility functions used by multiple DSV scripts."""
-from __future__ import annotations
-
 from argparse import ArgumentParser
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+from dsv_scripts import get_script_name
 
-def get_arg_parser(description: str = "") -> ArgumentParser:
+
+def get_arg_parser(module_file: str, description: str) -> ArgumentParser:
     """Creates and returns an `ArgumentParser` for a typical DSV input/output script.
 
     Args:
+        module_file:
+            A string containing the file path for the script module.
+            Will be parsed to determine the program name to display for the script.
         description:
             A string containing a short, human-readable summary of what the script does.
             Will be displayed when `--help` or `-h` is specified on the command line.
     """
-    parser = ArgumentParser(description=description or None, add_help=False)
+    parser = ArgumentParser(
+        prog=get_script_name(module_file), description=description, add_help=False
+    )
 
     def add_option(option_name: str, **kwargs: Any) -> None:
         parser.add_argument(f"-{option_name[0]}", f"--{option_name}", **kwargs)

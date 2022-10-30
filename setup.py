@@ -6,10 +6,7 @@ from setuptools import setup
 
 def get_console_scripts() -> list[str]:
     package_name = "dsv_scripts"
-    console_scripts = [
-        f"{script_name} = {package_name}.__main__:main"
-        for script_name in ("dsv", "dsv-scripts")
-    ]
+    console_scripts = [f"dsv-scripts = {package_name}.__main__:main"]
     module_spec = spec_from_file_location(package_name, f"{package_name}/__init__.py")
 
     if module_spec and module_spec.loader:
@@ -18,7 +15,7 @@ def get_console_scripts() -> list[str]:
         module_spec.loader.exec_module(dsv_scripts)
 
         console_scripts.extend(
-            f"{dsv_scripts.get_script_name(module)} = {module.__name__}:main"
+            f"{dsv_scripts.get_script_name(module.__file__)} = {module.__name__}:main"
             for module in dsv_scripts.get_script_modules()
         )
 

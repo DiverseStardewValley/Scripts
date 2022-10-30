@@ -1,6 +1,3 @@
-"""This module is the primary entry point (`dsv-scripts` or `python -m dsv_scripts`)."""
-from __future__ import annotations
-
 from importlib.metadata import metadata
 from typing import Final
 
@@ -18,7 +15,7 @@ _HEADER_LINES: Final[tuple[tuple[str, str], ...]] = (
 
 
 def main() -> int:
-    """Primary entry function. Parses args and calls the appropriate script/callback."""
+    """Primary entry point. Parses args and calls the appropriate script/callback."""
     get_metadata = metadata("dsv-scripts").json.get
     parser = CommandParser(
         *_HEADER_LINES,

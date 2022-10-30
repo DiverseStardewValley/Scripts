@@ -1,6 +1,3 @@
-"""This module contains the command parser/handler class for the primary entry point."""
-from __future__ import annotations
-
 import sys
 from argparse import ArgumentParser
 from types import ModuleType
@@ -48,11 +45,11 @@ class CommandParser(ArgumentParser):
                 remaining command-line arguments) and returns an integer representing an
                 exit code (i.e. 0 to indicate success, or 1 otherwise).
         """
-        name = get_script_name(module)
-        description = getattr(module, "DESCRIPTION", "")
+        name = get_script_name(module.__file__ or "")
+        main_function = getattr(module, "main")
+        description = (getattr(main_function, "__doc__") or "").split("\n")[0].strip()
         subparser = self.subparsers.add_parser(name, help=description, add_help=False)
-
-        subparser.set_defaults(callback=getattr(module, "main"))
+        subparser.set_defaults(callback=main_function)
         self.command_info.append((name, description))
 
     def print_help(self, file: IO[str] | None = None) -> None:
