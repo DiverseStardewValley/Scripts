@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
-from types import ModuleType
+from importlib import import_module
+from pathlib import Path
 from typing import Any, Final, IO
 
 from rich.console import Console, Group
@@ -35,19 +36,21 @@ class CommandParser(ArgumentParser):
 
         self.header[-1].append(f"v{version}".ljust(7).center(12), style="bright_black")
 
-    def add_command(self, module: ModuleType) -> None:
+    def add_command(self, module_path: Path) -> None:
         """Adds a command to this parser, making it usable through `dsv-scripts <name>`.
 
         Args:
-            module:
-                The module in which the command/script is defined.
-                Must contain a function named `main` that accepts a list of strings (the
-                remaining command-line arguments) and returns an integer representing an
-                exit code (i.e. 0 to indicate success, or 1 otherwise).
+            module_path:
+                The path to the module in which the command/script is defined.
+                The module must contain a function named `main` that accepts a list of
+                strings (the remaining command-line arguments) and returns an integer
+                representing an exit code (e.g. 0 to indicate success, or 1 otherwise).
         """
-        name = get_script_name(module.__file__ or "")
+        name = get_script_name(module_path)
+        module = import_module(f"{__package__}.{module_path.stem}")
         main_function = getattr(module, "main")
         description = (getattr(main_function, "__doc__") or "").split("\n")[0].strip()
+
         subparser = self.subparsers.add_parser(name, help=description, add_help=False)
         subparser.set_defaults(callback=main_function)
         self.command_info.append((name, description))

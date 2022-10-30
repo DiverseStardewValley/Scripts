@@ -92,7 +92,9 @@ class FileIOParser(ArgumentParser):
         )
 
         for file_path in file_paths:
-            files.append((input_dir / file_path, output_dir / file_path))
+            output_file = output_dir / file_path
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            files.append((input_dir / file_path, output_file))
 
         return Namespace(files=files, verbose=args.verbose)
 

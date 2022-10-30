@@ -1,7 +1,7 @@
 from importlib.metadata import metadata
 from typing import Final
 
-from dsv_scripts import get_script_modules
+from dsv_scripts import get_script_module_paths
 from dsv_scripts.commands import CommandParser
 
 _HEADER_LINES: Final[tuple[tuple[str, str], ...]] = (
@@ -24,8 +24,8 @@ def main() -> int:
     )
     parser.set_defaults(callback=parser.print_help)
 
-    for module in get_script_modules():
-        parser.add_command(module)
+    for module_path in get_script_module_paths():
+        parser.add_command(module_path)
 
     expected_args, extra_args = parser.parse_known_args()
     return expected_args.callback(extra_args) or 0

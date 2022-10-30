@@ -15,8 +15,9 @@ def get_console_scripts() -> list[str]:
         module_spec.loader.exec_module(dsv_scripts)
 
         console_scripts.extend(
-            f"{dsv_scripts.get_script_name(module.__file__)} = {module.__name__}:main"
-            for module in dsv_scripts.get_script_modules()
+            f"{dsv_scripts.get_script_name(module_path)} = "
+            f"{package_name}.{module_path.stem}:main"
+            for module_path in dsv_scripts.get_script_module_paths()
         )
 
     return console_scripts
