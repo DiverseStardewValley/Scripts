@@ -3,4 +3,4 @@
   description: Saves minified copies of JSON and/or JSON5 files.
   entry: minify-json
   language: python
-  types: [json, json5]
+  types_or: [json, json5]
