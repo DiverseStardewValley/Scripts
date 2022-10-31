@@ -4,3 +4,10 @@
   entry: minify-json
   language: python
   types_or: [json, json5]
+
+- id: remove-blank-lines
+  name: Remove blank lines
+  description: Removes blank lines in text-based files.
+  entry: remove-blank-lines
+  language: python
+  types: [text]
