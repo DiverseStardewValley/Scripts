@@ -1,6 +1,8 @@
+import re
 import sys
 from argparse import ArgumentParser, Namespace
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any, Final, IO, NamedTuple
 
 from rich.console import Console, ConsoleRenderable, Group
@@ -64,6 +66,7 @@ class FileIOParser(ArgumentParser):
         for name, metavar in [("input", "IN"), ("output", "OUT")]:
             add_option(name, f"Name of the {name} folder.", default="", metavar=metavar)
 
+        add_option("copy", "Files to copy as-is from input to output.", metavar="REGEX")
         add_option("force", "Force execute (may overwrite files).", action="store_true")
         add_option("verbose", "Enable verbose console output.", action="store_true")
         add_option("help", "Show this help message.", action="help")
@@ -73,8 +76,15 @@ class FileIOParser(ArgumentParser):
     ) -> Namespace:
         """Parses/processes the args, and returns a `Namespace` containing the results.
 
-        The most important attribute on the resulting `Namespace` is `files`, which is
-        a list of (`Path`, `Path`) tuples corresponding to the input and output files.
+        Attributes of the resulting `Namespace`:
+            files (list[tuple[pathlib.Path, pathlib.Path], ...]):
+                A list in which each tuple represents the input/output paths for a file.
+            logger (logging.Logger):
+                A logger initialized with the standard settings for this package.
+                (Accounts for the `-v` or `--verbose` command-line argument.)
+            should_copy (Callable[[Path], bool]):
+                A function that returns `True` if the given file should be copied as-is.
+                (Accounts for the `-c` or `--copy` command-line argument.)
 
         Args:
             argv:
@@ -82,13 +92,15 @@ class FileIOParser(ArgumentParser):
                 If omitted, `sys.argv` is assumed.
         """
         args = super().parse_args(argv)
+        copy = re.compile(args.copy or r"$^")
+        logger = utils.get_logger(args.verbose)
         files = []
 
         input_dir, output_dir = utils.get_input_and_output_dir_paths(
             input_path=args.input, output_path=args.output, force=args.force
         )
         file_paths = utils.get_relevant_file_paths(
-            args.paths, *self.file_exts, parent_dir=input_dir, verbose=args.verbose
+            args.paths, *self.file_exts, parent_dir=input_dir, log=logger.info
         )
 
         for file_path in file_paths:
@@ -96,7 +108,12 @@ class FileIOParser(ArgumentParser):
             output_file.parent.mkdir(parents=True, exist_ok=True)
             files.append((input_dir / file_path, output_file))
 
-        return Namespace(files=files, verbose=args.verbose)
+        logger.info(f"Found {len(files)} files to check and/or process.")
+
+        def should_copy(path: Path) -> bool:
+            return copy.search(str(path)) is not None
+
+        return Namespace(files=files, logger=logger, should_copy=should_copy)
 
     def print_help(self, file: IO[str] | None = None) -> None:
         """Outputs a message containing information about the script and its options.
@@ -110,7 +127,7 @@ class FileIOParser(ArgumentParser):
             Text(self.description, justify="center"),
             Text("\nUsage:", "bright_magenta"),
         ]
-        usage = escape(self.format_usage())
+        usage = escape(self.format_usage().replace(" ...", ""))
         usage_text = Text(f"  {usage[usage.index(self.prog):].strip()}")
         help_elements.append(usage_text)
 

@@ -1,7 +1,10 @@
-from collections.abc import Iterable
+import logging
+import os
+from collections.abc import Callable, Iterable
 from pathlib import Path
 
 from rich.console import Console
+from rich.logging import RichHandler
 from rich.panel import Panel
 from rich.text import Text
 
@@ -33,6 +36,24 @@ def get_dir_path(raw_path: str, *, create_if_missing: bool = False) -> Path:
         return dir_path
     else:
         raise FileNotFoundError(f"The requested directory does not exist: {dir_path}")
+
+
+def get_display_path(path: Path, relative_dir: Path | None = None) -> str:
+    """Returns a string representing the given path relative to a specific directory.
+
+    Args:
+        path:
+            The path to represent as a string.
+        relative_dir:
+            The path to the directory that will serve as the reference point.
+            If omitted, the current working directory will be used.
+    """
+    relative_dir = relative_dir or Path.cwd()
+    return (
+        f".{os.path.sep}{path.relative_to(relative_dir)}"
+        if path.is_relative_to(relative_dir)
+        else str(path)
+    )
 
 
 def get_input_and_output_dir_paths(
@@ -86,11 +107,35 @@ def get_input_and_output_dir_paths(
     return input_dir_path, output_dir_path
 
 
+def get_logger(verbose: bool = False) -> logging.Logger:
+    """Returns a pre-configured logger that uses the standard settings for this package.
+
+    Args:
+        verbose:
+            If set to `True`, will cause the logger to print `logging.DEBUG` messages.
+            (By default, it only prints messages with a level of `logging.INFO` and up).
+    """
+    handler = RichHandler(
+        omit_repeated_times=False,
+        show_level=False,
+        show_path=False,
+        markup=True,
+        rich_tracebacks=True,
+    )
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[handler],
+    )
+    return logging.getLogger(__package__)
+
+
 def get_relevant_file_paths(
     raw_paths: Iterable[str],
     *allowed_exts: str,
     parent_dir: Path | None = None,
-    verbose: bool = False,
+    log: Callable[[str], None] = print,
 ) -> list[Path]:
     """Returns a sorted list of paths for relevant files, based on the specified params.
 
@@ -113,29 +158,33 @@ def get_relevant_file_paths(
         parent_dir:
             The path to the directory that acts as a scope to determine which files are
             relevant. If omitted, the current working directory will serve as the scope.
-        verbose:
-            If set to `True`, will print information about examined files/directories.
+        log:
+            A function that accepts a string to be logged/printed.
+            If omitted, the built-in `print` function will be used.
 
     Raises:
         FileNotFoundError: If `parent_dir` or any of the `raw_paths` does not
             point to an existing file/directory.
     """
-    all_exts = ("*",)
-    allowed_exts = tuple(ext.strip(".").lower() for ext in allowed_exts) or all_exts
-    parent_dir = (parent_dir or Path.cwd()).resolve(strict=True)
+    cwd = Path.cwd()
+    parent_dir = (parent_dir or cwd).resolve(strict=True)
     file_paths: set[Path] = set()
+
+    all_exts = (".*",)
+    allowed_exts = tuple(f".{ext}".lower() for ext in allowed_exts) or all_exts
+    exts_text = "|".join(f"[cyan]{ext.strip('.')}[/]" for ext in allowed_exts)
 
     for raw_path in raw_paths or ["."]:
         path = Path(raw_path).resolve(strict=True)
         if path.is_dir():
-            if verbose:
-                print(f"Searching for relevant files inside directory '{path}'.")
+            label = "current" if (path == cwd) else f"[cyan]{get_display_path(path)}[/]"
+            log(f"Searching for ({exts_text}) files inside the {label} directory.")
             for ext in allowed_exts:
-                file_paths.update(path.rglob(f"*.{ext}"))
+                file_paths.update(path.rglob(f"*{ext}"))
         elif (allowed_exts == all_exts) or (path.suffix.lower() in allowed_exts):
             file_paths.add(path)
-        elif verbose:
-            print(f"File '{path}' does not have a relevant extension. Ignoring.")
+        else:
+            log(f"Skipping [cyan]{raw_path}[/] because it isn't a ({exts_text}) file.")
 
     return [
         file_path.relative_to(parent_dir)
