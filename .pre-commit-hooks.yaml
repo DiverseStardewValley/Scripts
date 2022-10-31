@@ -1,0 +1,6 @@
+- id: minify-json
+  name: Minify JSON files
+  description: Saves minified copies of JSON and/or JSON5 files.
+  entry: minify-json
+  language: python
+  types: [json, json5]

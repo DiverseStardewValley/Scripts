@@ -28,6 +28,8 @@ setup(
         "console_scripts": get_console_scripts(),
     },
     install_requires=[
+        "humanize >=4.4.0",
+        "pyjson5 >=1.6.2",
         "rich >=12.6.0",
     ],
     url="https://github.com/DiverseStardewValley/Scripts",
