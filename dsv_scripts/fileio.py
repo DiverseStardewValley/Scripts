@@ -26,7 +26,14 @@ class _Option(NamedTuple):
 class FileIOParser(ArgumentParser):
     """A specialized `ArgumentParser` for scripts that deal with file input & output."""
 
-    def __init__(self, module_file: str, *file_exts: str, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        module_file: str,
+        *file_exts: str,
+        add_copy_option: bool = True,
+        add_force_option: bool = True,
+        **kwargs: Any,
+    ) -> None:
         """Initializes a new `FileIOParser` instance.
 
         Args:
@@ -36,6 +43,10 @@ class FileIOParser(ArgumentParser):
             *file_exts:
                 Strings representing the file extensions to process (case-insensitive).
                 If omitted, **all** file extensions will be included for processing.
+            add_copy_option:
+                Whether to include the `-c` or `--copy` option. Defaults to `True`.
+            add_force_option:
+                Whether to include the `-f` or `--force` option. Defaults to `True`.
             **kwargs:
                 Keyword arguments to be forwarded to the `ArgumentParser` constructor.
         """
@@ -43,8 +54,8 @@ class FileIOParser(ArgumentParser):
 
         self.arg_name: Final[str] = "paths"
         self.arg_description: Final[str] = (
-            f"Paths to specific .{' or .'.join(file_exts)} files.\n"
-            "If omitted, will scan the current directory."
+            f"Paths to specific{(' .' + ' or .'.join(file_exts)) if file_exts else ''} "
+            f"files.\nIf omitted, will scan the current directory."
         )
         self.file_exts: Final[tuple[str, ...]] = file_exts
         self.options: Final[list[_Option]] = []
@@ -66,8 +77,15 @@ class FileIOParser(ArgumentParser):
         for name, metavar in [("input", "IN"), ("output", "OUT")]:
             add_option(name, f"Name of the {name} folder.", default="", metavar=metavar)
 
-        add_option("copy", "Files to copy as-is from input to output.", metavar="REGEX")
-        add_option("force", "Force execute (may overwrite files).", action="store_true")
+        if add_copy_option:
+            add_option(
+                "copy", "Files to copy as-is from input to output.", metavar="REGEX"
+            )
+        if add_force_option:
+            add_option(
+                "force", "Force execute. (May overwrite files!)", action="store_true"
+            )
+
         add_option("verbose", "Enable verbose console output.", action="store_true")
         add_option("help", "Show this help message.", action="help")
 
@@ -81,10 +99,10 @@ class FileIOParser(ArgumentParser):
                 A list in which each tuple represents the input/output paths for a file.
             logger (logging.Logger):
                 A logger initialized with the standard settings for this package.
-                (Accounts for the `-v` or `--verbose` command-line argument.)
+                (Accounts for the `-v` or `--verbose` command-line option.)
             should_copy (Callable[[Path], bool]):
                 A function that returns `True` if the given file should be copied as-is.
-                (Accounts for the `-c` or `--copy` command-line argument.)
+                (Accounts for the `-c` or `--copy` command-line option.)
 
         Args:
             argv:
@@ -92,12 +110,14 @@ class FileIOParser(ArgumentParser):
                 If omitted, `sys.argv` is assumed.
         """
         args = super().parse_args(argv)
-        copy = re.compile(args.copy or r"$^")
+        copy = re.compile(getattr(args, "copy", None) or r"$^")  # "$^" never matches.
         logger = utils.get_logger(args.verbose)
         files = []
 
         input_dir, output_dir = utils.get_input_and_output_dir_paths(
-            input_path=args.input, output_path=args.output, force=args.force
+            input_path=args.input,
+            output_path=args.output,
+            force=getattr(args, "force", True),
         )
         file_paths = utils.get_relevant_file_paths(
             args.paths, *self.file_exts, parent_dir=input_dir, log=logger.info

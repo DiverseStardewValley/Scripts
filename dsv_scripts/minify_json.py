@@ -35,10 +35,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             logd(f"[bright_black]No change: {output_file_display_path}")
         elif should_copy:
             log(f"[bright_magenta]>>Copying:[/] {output_file_display_path}")
-            output_file.write_text(input_text)
+            output_file.write_text(input_text, newline="\n")
         else:
             log(f"[bright_yellow]Minifying:[/] {output_file_display_path}")
-            output_file.write_text(output_text)
+            output_file.write_text(output_text)  # No newlines written, not even at EOF.
 
             input_size = input_file.stat().st_size
             output_size = output_file.stat().st_size
