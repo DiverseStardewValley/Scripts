@@ -31,7 +31,6 @@ class FileIOParser(ArgumentParser):
         module_file: str,
         *file_exts: str,
         add_copy_option: bool = True,
-        add_force_option: bool = True,
         **kwargs: Any,
     ) -> None:
         """Initializes a new `FileIOParser` instance.
@@ -45,8 +44,6 @@ class FileIOParser(ArgumentParser):
                 If omitted, **all** file extensions will be included for processing.
             add_copy_option:
                 Whether to include the `-c` or `--copy` option. Defaults to `True`.
-            add_force_option:
-                Whether to include the `-f` or `--force` option. Defaults to `True`.
             **kwargs:
                 Keyword arguments to be forwarded to the `ArgumentParser` constructor.
         """
@@ -81,11 +78,8 @@ class FileIOParser(ArgumentParser):
             add_option(
                 "copy", "Files to copy as-is from input to output.", metavar="REGEX"
             )
-        if add_force_option:
-            add_option(
-                "force", "Force execute. (May overwrite files!)", action="store_true"
-            )
 
+        add_option("force", "Force execute (may overwrite files).", action="store_true")
         add_option("verbose", "Enable verbose console output.", action="store_true")
         add_option("help", "Show this help message.", action="help")
 

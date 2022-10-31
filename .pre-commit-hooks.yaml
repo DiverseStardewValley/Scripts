@@ -9,5 +9,6 @@
   name: Remove blank lines
   description: Removes blank lines in text-based files.
   entry: remove-blank-lines
+  args: ["--force"]
   language: python
-  types: [text]
+  files: "^$"

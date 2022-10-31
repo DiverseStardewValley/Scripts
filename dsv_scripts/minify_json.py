@@ -27,9 +27,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         if should_copy := args.should_copy(input_file):
             output_text = input_text
         else:
-            output_text = json.dumps(
+            minified_json = json.dumps(
                 pyjson5.loads(input_text), ensure_ascii=False, separators=(",", ":")
             )
+            output_text = f"{minified_json.strip()}\n"
 
         if output_file.exists() and (output_file.read_text() == output_text):
             logd(f"[bright_black]No change: {output_file_display_path}")
@@ -38,7 +39,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             output_file.write_text(input_text, newline="\n")
         else:
             log(f"[bright_yellow]Minifying:[/] {output_file_display_path}")
-            output_file.write_text(output_text)  # No newlines written, not even at EOF.
+            output_file.write_text(output_text, newline="\n")
 
             input_size = input_file.stat().st_size
             output_size = output_file.stat().st_size
@@ -46,9 +47,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
             if size_diff < 0:
                 args.logger.warning(
-                    f"[bright_red]  WARNING: Minified file is[/] "
-                    f"[bright_white on red]{size(-size_diff)}[/] "
-                    f"[bright_red]larger than the original file.",
+                    f"[bright_red]  WARNING: Minified file is[/] [bright_white on red]"
+                    f"{size(-size_diff)}[/] [bright_red]larger than the original file.",
                     extra=no_highlight,
                 )
                 warnings -= 1

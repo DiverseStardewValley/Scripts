@@ -10,7 +10,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = FileIOParser(
         __file__,
         add_copy_option=False,
-        add_force_option=False,
         description=main.__doc__,
     ).parse_args(argv)
     blank_line_regex = re.compile("\n\n")

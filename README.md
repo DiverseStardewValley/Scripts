@@ -1,5 +1,11 @@
 # <a href="https://github.com/DiverseStardewValley"><img src="https://avatars.githubusercontent.com/u/116469492" width=24></a> DSV - Scripts
 
+[![Release](https://img.shields.io/github/v/tag/DiverseStardewValley/Scripts?label=Release&style=flat-square)](https://github.com/DiverseStardewValley/Scripts/tags)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-blue?style=flat-square)](https://github.com/DiverseStardewValley/Scripts/blob/main/pyproject.toml)
+[![Build](https://img.shields.io/github/workflow/status/DiverseStardewValley/Scripts/CI?label=Build&style=flat-square)](https://github.com/DiverseStardewValley/Scripts/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/github/workflow/status/DiverseStardewValley/Scripts/CodeQL?label=CodeQL&style=flat-square)](https://github.com/DiverseStardewValley/Scripts/actions/workflows/codeql.yml)
+[![CodeFactor](https://img.shields.io/codefactor/grade/github/DiverseStardewValley/Scripts/main?label=CodeFactor&style=flat-square)](https://www.codefactor.io/repository/github/diversestardewvalley/scripts)
+
 Various Python scripts to help manage the Diverse Stardew Valley mod and its
 many files.
 
@@ -15,7 +21,7 @@ many files.
 
 ## Installation
 
-If you just want to **use** the scripts, this command will work for initial
+If you just want to **use** these scripts, this command will work for initial
 installation as well as subsequent updates:
 
 ```
@@ -55,16 +61,16 @@ script!) - you'll most likely want to use these steps instead...
    pip install -e .
    ```
 
-Any local changes you make to the code will be reflected when you run it, thanks
-to the
-[`-e`](https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs)
-flag.
+**Note:** The `-e` flag indicates an
+[editable install](https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs),
+which means that any changes you make to the code will immediately take effect
+when you run the program locally.
 
 </details>
 
 ## Usage
 
-Once you've installed the package, you can view its help menu by using this
+Once you've installed this package, you can view its help menu by using this
 command from any directory:
 
 ```
@@ -84,7 +90,7 @@ If everything was set up correctly, you should see something like this...
 │          / _` / __\ \ / /__/ __|/ __| '__| | '_ \| __/ __|         │
 │         | (_| \__ \\ V /___\__ \ (__| |  | | |_) | |_\__ \         │
 │          \__,_|___/ \_/    |___/\___|_|  |_| .__/ \__|___/         │
-│                                            |_|   v0.1.1            │
+│                                            |_|   v0.1.2            │
 │                                                                    │
 │   Various scripts to help manage the Diverse Stardew Valley mod.   │
 │                                                                    │
@@ -96,9 +102,9 @@ If everything was set up correctly, you should see something like this...
 
 </details>
 
-Similarly to the main `dsv-scripts` command, all of the additional listed
-commands can be used from any directory. To see more information about any given
-command, use its `-h` option (for example, `minify-json -h`).
+Just like the primary `dsv-scripts` command, all of the additional listed
+commands can be used from any directory. To see more information about a given
+command or script, use its `-h` option (for example, `minify-json -h`).
 
 ## License
 
