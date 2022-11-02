@@ -9,6 +9,10 @@
 Various Python scripts to help manage the Diverse Stardew Valley mod and its
 many files.
 
+While these scripts are/were developed primarily with DSV's use cases in mind,
+they can be quite handy for general purposes too - and they're fairly easy for
+anyone to set up and use!
+
 ## Requirements
 
 - `git` - https://git-scm.com/downloads
@@ -103,8 +107,39 @@ If everything was set up correctly, you should see something like this...
 </details>
 
 Just like the primary `dsv-scripts` command, all of the additional listed
-commands can be used from any directory. To see more information about a given
-command or script, use its `-h` option (for example, `minify-json -h`).
+commands can be used from any directory. To see more information about a command
+or script, use its `-h` option (for example, `minify-json -h`).
+
+## Git Hooks
+
+These scripts can also be installed as
+[pre-commit](https://github.com/pre-commit/pre-commit) hooks for seamless
+integration into your workflow. (If you're unfamiliar with pre-commit, here's
+its [quickstart](https://pre-commit.com/index.html#quick-start) guide. Highly
+recommend!)
+
+When your `.pre-commit-config.yaml` is ready, simply add this repo and the hooks
+you want to use. For example:
+
+```yaml
+- repo: https://github.com/DiverseStardewValley/Scripts
+  rev: 0.1.2
+  hooks:
+    - id: remove-blank-lines
+      files: ^src/.+\.json$
+    - id: minify-json
+      args: ["--input=src", "--output=pkg"]
+```
+
+## Contributing
+
+Contributions to this repository are always encouraged and very much
+appreciated! If you think something in the documentation should be clarified, or
+if you have an idea for a script that would be useful, you're more than welcome
+to open a pull request. 💗
+
+For general information about contributing to DSV, check out our
+[contributing guidelines](https://github.com/DiverseStardewValley/.github/blob/main/.github/contributing.md).
 
 ## License
 
