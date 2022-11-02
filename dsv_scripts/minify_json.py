@@ -14,7 +14,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = FileIOParser(__file__, "json", "json5", description=main.__doc__)
     args = parser.parse_args(argv)
     size = partial(humanize.naturalsize, binary=True)
-    bytes_saved, files_changed, warnings = 0, 0, 0
+    bytes_saved, files_written, warnings = 0, 0, 0
 
     no_highlight = {"highlighter": None}
     log = partial(args.logger.info, extra=no_highlight)
@@ -37,6 +37,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif should_copy:
             log(f"[bright_magenta]>>Copying:[/] {output_file_display_path}")
             output_file.write_text(input_text, newline="\n")
+            files_written += 1
         else:
             log(f"[bright_yellow]Minifying:[/] {output_file_display_path}")
             output_file.write_text(output_text, newline="\n")
@@ -53,30 +54,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
                 warnings -= 1
             else:
-                logd(f"[red]   Before: [bright_white on red]{input_size}[/] [red]bytes")
-                after_color = "green" if (size_diff > 0) else "yellow"
-                logd(
-                    f"[{after_color}]    After: [bright_white on {after_color}]"
-                    f"{output_size}[/] [after_color]bytes"
-                )
+                utils.print_compressed_file_info(logd, input_size, output_size)
 
             bytes_saved += size_diff
-            files_changed += 1
+            files_written += 1
 
-    log(
-        f"[bright_{'red' if warnings else 'green'}]Minification complete"
-        f"{f' with {-warnings} warning(s)' if warnings else ''}.[/]"
-        f"{'' if files_changed else ' (All files were already up-to-date.)'}"
-    )
-
-    if files_changed:
-        log(
-            f"Processed [bright_white on cyan]{files_changed} file"
-            f"{'s' if (files_changed > 1) else ''}[/], saving a total of [bright_white"
-            f" on {'green' if (bytes_saved > 0) else 'red'}]{size(bytes_saved)}[/]."
-        )
-
-    return warnings or files_changed
+    utils.print_compression_task_result(log, size, bytes_saved, files_written, warnings)
+    return warnings or files_written
 
 
 if __name__ == "__main__":
