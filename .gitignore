@@ -8,6 +8,7 @@
 *.tmp
 *venv/
 .DS_Store
+.env
 .idea/
 .vscode/
 Thumbs.db

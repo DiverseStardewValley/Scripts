@@ -30,7 +30,9 @@ setup(
     install_requires=[
         "humanize >=4.4.0",
         "pyjson5 >=1.6.2",
+        "python-dotenv >=0.21.0",
         "rich >=12.6.0",
+        "tinify >=1.6.0",
     ],
     url="https://github.com/DiverseStardewValley/Scripts",
 )

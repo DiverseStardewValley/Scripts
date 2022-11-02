@@ -94,13 +94,14 @@ If everything was set up correctly, you should see something like this...
 │          / _` / __\ \ / /__/ __|/ __| '__| | '_ \| __/ __|         │
 │         | (_| \__ \\ V /___\__ \ (__| |  | | |_) | |_\__ \         │
 │          \__,_|___/ \_/    |___/\___|_|  |_| .__/ \__|___/         │
-│                                            |_|   v0.1.2            │
+│                                            |_|   v0.1.3            │
 │                                                                    │
 │   Various scripts to help manage the Diverse Stardew Valley mod.   │
 │                                                                    │
 │  Command              Description                                  │
 │  minify-json          Saves minified copies of JSON/JSON5 files.   │
 │  remove-blank-lines   Removes blank lines in text-based files.     │
+│  tinify-pngs          Saves compressed copies of PNG images.       │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -112,23 +113,23 @@ or script, use its `-h` option (for example, `minify-json -h`).
 
 ## Git Hooks
 
-These scripts can also be installed as
+Most of these scripts can also be installed as
 [pre-commit](https://github.com/pre-commit/pre-commit) hooks for seamless
 integration into your workflow. (If you're unfamiliar with pre-commit, here's
 its [quickstart](https://pre-commit.com/index.html#quick-start) guide. Highly
-recommend!)
+recommend it for any project!)
 
 When your `.pre-commit-config.yaml` is ready, simply add this repo and the hooks
 you want to use. For example:
 
 ```yaml
 - repo: https://github.com/DiverseStardewValley/Scripts
-  rev: 0.1.2
+  rev: 0.1.3
   hooks:
-    - id: remove-blank-lines
-      files: ^src/.+\.json$
     - id: minify-json
       args: ["--input=src", "--output=pkg"]
+    - id: remove-blank-lines
+      files: ^src/.+\.json$
 ```
 
 ## Contributing
