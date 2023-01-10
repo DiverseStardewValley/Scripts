@@ -42,12 +42,12 @@ repos:
       - id: black
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.1
+    rev: 5.11.4
     hooks:
       - id: isort
 
   - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.1.1
+    rev: 6.2.3
     hooks:
       - id: pydocstyle
         additional_dependencies: ["toml"]
@@ -88,6 +88,6 @@ repos:
       - id: fix-spaces
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.19.2
+    rev: 0.20.0
     hooks:
       - id: check-github-workflows
