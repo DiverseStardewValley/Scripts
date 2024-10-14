@@ -1,26 +1,26 @@
 [build-system]
-requires = ["setuptools>=61.0.0", "setuptools_scm[toml]>=7.0.0"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.0.0", "setuptools_scm[toml]>=7.0.0"]
 
 [project]
-name = "dsv-scripts"
-authors = [{ name = "The DSV Team" }]
+authors = [{name = "The DSV Team"}]
 description = "Various scripts to help manage the Diverse Stardew Valley mod."
-readme = "README.md"
-license = { text = "BSD-3-Clause" }
-requires-python = ">=3.10"
 dynamic = ["dependencies", "urls", "version"]
+license = {text = "BSD-3-Clause"}
+name = "dsv-scripts"
+readme = "README.md"
+requires-python = ">=3.10"
 
 [tool.black]
 target-version = ["py310"]
 
 [tool.isort]
-profile = "black"
 classes = ["IO"]
+profile = "black"
 
 [tool.pydocstyle]
-convention = "google"
 add-ignore = ["D100", "D417"]
+convention = "google"
 match = 'dsv_scripts/.+\.py'
 
 [tool.setuptools_scm]
