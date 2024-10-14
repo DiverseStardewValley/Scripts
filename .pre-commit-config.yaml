@@ -1,12 +1,12 @@
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
+    rev: v3.18.0
     hooks:
       - id: pyupgrade
         args: ["--py310-plus"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: check-ast
       - id: check-builtin-literals
@@ -26,7 +26,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
       - id: python-check-blanket-noqa
       - id: python-check-blanket-type-ignore
@@ -37,57 +37,57 @@ repos:
       - id: text-unicode-replacement-char
 
   - repo: https://github.com/psf/black
-    rev: 22.12.0
+    rev: 24.10.0
     hooks:
       - id: black
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.1
+    rev: 5.13.2
     hooks:
       - id: isort
 
   - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.1.1
+    rev: 6.3.0
     hooks:
       - id: pydocstyle
         additional_dependencies: ["toml"]
 
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.0.0
+    rev: v2.3.1
     hooks:
       - id: autoflake
         args: ["-i", "--remove-all-unused-imports", "--remove-unused-variables"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.991
+    rev: v1.11.2
     hooks:
       - id: mypy
         args: ["--ignore-missing-imports", "--show-error-codes"]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0-alpha.4
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         args: ["--prose-wrap=always"]
 
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.5.0
+    rev: v2.14.0
     hooks:
       - id: pretty-format-toml
         args: ["--autofix"]
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.3.1
+    rev: v1.5.5
     hooks:
       - id: remove-tabs
 
   - repo: https://github.com/sirosen/texthooks
-    rev: 0.4.0
+    rev: 0.6.7
     hooks:
       - id: fix-smartquotes
       - id: fix-spaces
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.19.2
+    rev: 0.29.4
     hooks:
       - id: check-github-workflows
