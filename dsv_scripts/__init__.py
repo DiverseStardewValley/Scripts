@@ -1,4 +1,5 @@
 """Main package for `dsv-scripts` (https://github.com/DiverseStardewValley/Scripts)."""
+
 import re
 from pathlib import Path
 
